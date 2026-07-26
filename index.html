@@ -3,130 +3,321 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Caja de Panes</title>
+    <title>Caja de Panes Visual</title>
     <style>
-        /* Estilos visuales: colores suaves, botones gigantes y sin texto complejo */
-        body { font-family: sans-serif; text-align: center; background-color: #f4f4f9; margin: 0; padding: 20px; }
-        h1 { color: #333; }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            text-align: center; 
+            background-color: #f0f4f8; 
+            margin: 0; 
+            padding: 10px; 
+            color: #333; 
+        }
+        
+        /* Botón de configuración (Adulto) */
+        .btn-config { position: absolute; top: 15px; right: 15px; font-size: 30px; background: none; border: none; cursor: pointer; }
+        
+        /* Zona 1: Venta */
+        .venta-box { background: white; border-radius: 20px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 20px; }
         
         .btn-pan { 
-            font-size: 120px; 
-            padding: 20px 40px; 
+            font-size: 100px; 
+            padding: 10px 40px; 
             border-radius: 30px; 
             border: none; 
-            background: #ffdfba; 
-            box-shadow: 0 8px 15px rgba(0,0,0,0.15); 
+            background: #ffecd2; 
+            box-shadow: 0 8px 15px rgba(255, 166, 0, 0.2); 
             cursor: pointer; 
             transition: transform 0.1s; 
-            margin-top: 20px;
         }
-        .btn-pan:active { transform: scale(0.95); } /* Efecto de hundirse al tocar */
+        .btn-pan:active { transform: scale(0.92); }
         
-        .iconos-container { min-height: 80px; font-size: 50px; margin: 20px 0; }
-        .total-texto { font-size: 60px; font-weight: bold; margin: 20px 0; color: #222; }
+        .iconos-container { min-height: 60px; font-size: 40px; margin: 10px 0; }
+        .total-texto { font-size: 45px; font-weight: bold; color: #d35400; margin: 0; }
+
+        /* Zona 2: Pago del cliente */
+        .pago-box { background: #e8f8f5; border-radius: 20px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        .titulo-seccion { font-size: 24px; font-weight: bold; color: #2c3e50; margin-bottom: 15px; }
         
+        .billetes-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        /* Estilo base de los billetes */
+        .billete {
+            width: 140px;
+            height: 65px;
+            border-radius: 8px;
+            cursor: pointer;
+            border: 3px solid transparent;
+            transition: transform 0.2s, border 0.2s;
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: white;
+            text-shadow: 1px 1px 4px black;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+        .billete:active { transform: scale(0.95); }
+        .billete.seleccionado { border: 4px solid #e74c3c; transform: scale(1.05); box-shadow: 0 0 15px rgba(231, 76, 60, 0.6); }
+
+        /* Asignación de colores por si la imagen tarda en cargar */
+        .b-20000 { background-color: #7ab3e1; background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/f/f6/20000_pesos_argentinos_anverso_%282024%29.jpg/640px-20000_pesos_argentinos_anverso_%282024%29.jpg'); }
+        .b-10000 { background-color: #b3d4ce; background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/9/90/10000_pesos_argentinos_anverso_%282024%29.jpg/640px-10000_pesos_argentinos_anverso_%282024%29.jpg'); }
+        .b-2000 { background-color: #d9a5b3; background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/2000_pesos_argentinos_anverso.jpg/640px-2000_pesos_argentinos_anverso.jpg'); }
+        .b-1000 { background-color: #e68a5c; background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/1000_pesos_argentinos_anverso.jpg/640px-1000_pesos_argentinos_anverso.jpg'); }
+        .b-500 { background-color: #7b9f82; background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/f/f3/500_pesos_argentinos_anverso.jpg/640px-500_pesos_argentinos_anverso.jpg'); }
+        .b-200 { background-color: #6fa8dc; background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/f/f5/200_pesos_argentinos_anverso.jpg/640px-200_pesos_argentinos_anverso.jpg'); }
+        .b-100 { background-color: #b4a7d6; background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/9/98/100_pesos_argentinos_-_taruca_-_anverso.jpg/640px-100_pesos_argentinos_-_taruca_-_anverso.jpg'); }
+
+        /* Zona 3: Vuelto (Lo que tiene que dar) */
+        .vuelto-box { background: #fdf2e9; border-radius: 20px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 20px; min-height: 120px; }
+        .mensaje-vuelto { font-size: 28px; font-weight: bold; color: #27ae60; margin-top: 20px; }
+
+        /* Botón final */
         .btn-cobrar { 
-            font-size: 40px; 
-            padding: 20px 50px; 
-            background-color: #baffc9; 
+            font-size: 30px; 
+            padding: 15px 40px; 
+            background-color: #2ecc71; 
+            color: white;
             border: none; 
             border-radius: 20px; 
             cursor: pointer; 
-            box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 5px 10px rgba(46, 204, 113, 0.4);
+            font-weight: bold;
+            width: 90%;
+            max-width: 400px;
         }
         .btn-cobrar:active { transform: scale(0.95); }
 
-        .estadisticas { margin-top: 40px; font-size: 24px; color: #555; }
-        
-        /* Panel del adulto oculto por defecto */
-        .btn-config { position: absolute; top: 20px; right: 20px; font-size: 35px; background: none; border: none; cursor: pointer; }
-        .panel-config { display: none; background: #ddd; padding: 20px; border-radius: 15px; margin-top: 40px; text-align: left; }
-        .panel-config input { font-size: 20px; width: 80px; text-align: center; }
-        .panel-config button { font-size: 20px; padding: 10px; margin-top: 10px; cursor: pointer; }
+        /* Panel Adulto */
+        .panel-config { display: none; background: #fff; padding: 20px; border-radius: 20px; margin-top: 20px; text-align: left; border: 2px solid #ccc; }
+        .panel-config input { font-size: 20px; width: 100%; padding: 10px; margin-top: 5px; box-sizing: border-box; border-radius: 8px; border: 1px solid #aaa; }
+        .panel-config button { margin-top: 15px; padding: 10px; font-size: 18px; width: 100%; background: #e74c3c; color: white; border: none; border-radius: 10px; cursor: pointer; }
+
     </style>
 </head>
 <body>
 
-    <!-- Botón discreto para el adulto -->
+    <!-- Botón Adulto -->
     <button class="btn-config" onclick="toggleConfig()">⚙️</button>
 
-    <h1>Venta de Pan</h1>
-    
-    <!-- El botón gigante para el chico -->
-    <button class="btn-pan" onclick="agregarPan()">🍞</button>
-    
-    <!-- Acá aparecen los dibujitos de los panes que va tocando -->
-    <div class="iconos-container" id="iconos-pan"></div>
-    
-    <!-- El precio total a cobrar -->
-    <div class="total-texto">Total: $<span id="total-precio">0</span></div>
-    
-    <!-- Botón para cerrar la venta -->
-    <button class="btn-cobrar" onclick="cobrar()">✅ Listo</button>
-
-    <!-- Contador del día -->
-    <div class="estadisticas">
-        Panes vendidos hoy: <strong id="total-dia">0</strong>
+    <!-- ZONA 1: Sumar Panes -->
+    <div class="venta-box">
+        <button class="btn-pan" onclick="agregarPan()">🍞</button>
+        <div class="iconos-container" id="iconos-pan"></div>
+        <div class="total-texto">Total: $<span id="total-precio">0</span></div>
     </div>
 
-    <!-- Panel de configuración (solo se ve si tocan la tuerca) -->
+    <!-- ZONA 2: Billete que entrega el cliente -->
+    <div class="pago-box">
+        <div class="titulo-seccion">1. ¿Qué billete te dio el cliente? 💵</div>
+        <div class="billetes-grid">
+            <!-- Él toca el billete que le dieron. Tienen clases visuales y de fondo -->
+            <div class="billete b-20000" onclick="seleccionarPago(20000, this)">$20.000</div>
+            <div class="billete b-10000" onclick="seleccionarPago(10000, this)">$10.000</div>
+            <div class="billete b-2000" onclick="seleccionarPago(2000, this)">$2.000</div>
+            <div class="billete b-1000" onclick="seleccionarPago(1000, this)">$1.000</div>
+            <div class="billete b-500" onclick="seleccionarPago(500, this)">$500</div>
+        </div>
+    </div>
+
+    <!-- ZONA 3: Billetes que él tiene que devolver (Vuelto) -->
+    <div class="vuelto-box">
+        <div class="titulo-seccion">2. Billetes que tenés que darle: 🤲</div>
+        <div class="billetes-grid" id="contenedor-vuelto">
+            <!-- Acá se van a dibujar automáticamente los billetes del vuelto -->
+            <div style="color: #888; font-size: 18px; margin-top: 10px;">Tocá el pan y luego el billete que te pagaron para ver el vuelto.</div>
+        </div>
+        <div class="mensaje-vuelto" id="mensaje-vuelto"></div>
+    </div>
+
+    <!-- ZONA 4: Finalizar venta -->
+    <button class="btn-cobrar" onclick="cobrar()">✅ Listo (Siguiente)</button>
+
+    <div style="margin-top: 15px; color: #888; font-weight: bold;">
+        Panes vendidos hoy: <span id="total-dia">0</span>
+    </div>
+
+    <!-- Panel de configuración (Adulto) -->
     <div class="panel-config" id="panel-config">
-        <h3>Configuración (Adulto)</h3>
-        <label>Precio por pan: $</label>
-        <input type="number" id="input-precio" value="1" onchange="actualizarPrecio()">
-        <br>
-        <button onclick="reiniciarDia()">Reiniciar día a cero</button>
+        <h3>Panel Adulto</h3>
+        <label>Precio de 1 pan ($):</label>
+        <input type="number" id="input-precio" value="1000" onchange="actualizarPrecio()">
+        <button onclick="reiniciarDia()">Reiniciar ventas del día a cero</button>
     </div>
 
     <script>
-        // Variables donde guardamos los datos
-        let precioUnitario = 1;
+        // Variables
+        let precioUnitario = 1000; // Lo puse en $1000 por defecto para que sea realista
         let panesActuales = 0;
+        let pagoCliente = 0;
         let panesDia = 0;
 
-        // Función que se activa cuando toca el pan gigante
+        // Billetes disponibles para dar vuelto (de mayor a menor)
+        const billetesVuelto = [
+            { valor: 20000, clase: 'b-20000' },
+            { valor: 10000, clase: 'b-10000' },
+            { valor: 2000, clase: 'b-2000' },
+            { valor: 1000, clase: 'b-1000' },
+            { valor: 500, clase: 'b-500' },
+            { valor: 200, clase: 'b-200' },
+            { valor: 100, clase: 'b-100' }
+        ];
+
+        // --- SONIDOS SINTÉTICOS ---
+        function reproducirChaChing() {
+            try {
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                
+                // Sonido 1
+                const osc1 = audioCtx.createOscillator();
+                const gain1 = audioCtx.createGain();
+                osc1.type = 'square';
+                osc1.frequency.setValueAtTime(1000, audioCtx.currentTime);
+                osc1.frequency.exponentialRampToValueAtTime(1500, audioCtx.currentTime + 0.1);
+                gain1.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                gain1.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.2);
+                osc1.connect(gain1);
+                gain1.connect(audioCtx.destination);
+                osc1.start();
+                osc1.stop(audioCtx.currentTime + 0.2);
+
+                // Sonido 2 (Eco metálico)
+                setTimeout(() => {
+                    const osc2 = audioCtx.createOscillator();
+                    const gain2 = audioCtx.createGain();
+                    osc2.type = 'sine';
+                    osc2.frequency.setValueAtTime(2000, audioCtx.currentTime);
+                    gain2.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                    gain2.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.4);
+                    osc2.connect(gain2);
+                    gain2.connect(audioCtx.destination);
+                    osc2.start();
+                    osc2.stop(audioCtx.currentTime + 0.4);
+                }, 100);
+            } catch (e) { console.log("Audio no disponible"); }
+        }
+
+        // --- LÓGICA PRINCIPAL ---
         function agregarPan() {
             panesActuales++;
-            actualizarPantalla();
+            reproducirChaChing(); // Suena la caja registradora
+            calcularTodo();
         }
 
-        // Función que se activa cuando cobra (botón verde)
+        function seleccionarPago(monto, elemento) {
+            pagoCliente = monto;
+            
+            // Remarcar en rojo el billete que tocó
+            let botones = document.querySelectorAll('.pago-box .billete');
+            botones.forEach(btn => btn.classList.remove('seleccionado'));
+            elemento.classList.add('seleccionado');
+            
+            calcularTodo();
+        }
+
+        function calcularTodo() {
+            let totalCompra = panesActuales * precioUnitario;
+            
+            // 1. Actualizar sección de venta
+            document.getElementById('total-precio').innerText = totalCompra;
+            let iconos = "";
+            for(let i=0; i<panesActuales; i++) iconos += "🍞 ";
+            document.getElementById('iconos-pan').innerText = iconos;
+
+            // 2. Calcular Vuelto Visual
+            let contenedorVuelto = document.getElementById('contenedor-vuelto');
+            let msjVuelto = document.getElementById('mensaje-vuelto');
+            
+            contenedorVuelto.innerHTML = ""; // Limpiar vuelto anterior
+            msjVuelto.innerText = "";
+
+            if (panesActuales === 0) {
+                contenedorVuelto.innerHTML = '<div style="color: #888;">Tocá el pan primero.</div>';
+                return;
+            }
+
+            if (pagoCliente === 0) {
+                contenedorVuelto.innerHTML = '<div style="color: #888;">Tocá el billete con el que te pagan arriba.</div>';
+                return;
+            }
+
+            if (pagoCliente < totalCompra) {
+                msjVuelto.style.color = "#e74c3c";
+                msjVuelto.innerText = "❌ Falta plata. El cliente tiene que dar más.";
+                return;
+            }
+
+            let vueltoTotal = pagoCliente - totalCompra;
+
+            if (vueltoTotal === 0) {
+                msjVuelto.style.color = "#27ae60";
+                msjVuelto.innerText = "✅ ¡Pago justo! No hay que dar vuelto.";
+                return;
+            }
+
+            // Algoritmo para separar el vuelto en billetes reales
+            let resto = vueltoTotal;
+            for (let billete of billetesVuelto) {
+                while (resto >= billete.valor) {
+                    // Dibuja físicamente la imagen del billete en pantalla
+                    let divBillete = document.createElement("div");
+                    divBillete.className = `billete ${billete.clase}`;
+                    divBillete.innerText = `$${billete.valor}`;
+                    contenedorVuelto.appendChild(divBillete);
+                    
+                    resto -= billete.valor;
+                }
+            }
+            
+            msjVuelto.style.color = "#27ae60";
+            msjVuelto.innerText = `Total vuelto: $${vueltoTotal}`;
+        }
+
         function cobrar() {
             if(panesActuales > 0) {
+                // Sumar al total del día
                 panesDia += panesActuales;
-                panesActuales = 0;
                 document.getElementById('total-dia').innerText = panesDia;
-                actualizarPantalla();
+                
+                // Reiniciar todo para el siguiente cliente
+                panesActuales = 0;
+                pagoCliente = 0;
+                
+                let botones = document.querySelectorAll('.pago-box .billete');
+                botones.forEach(btn => btn.classList.remove('seleccionado'));
+                
+                document.getElementById('contenedor-vuelto').innerHTML = '<div style="color: #888; font-size: 18px; margin-top: 10px;">Venta terminada. Listo para el próximo.</div>';
+                document.getElementById('mensaje-vuelto').innerText = "";
+                
+                calcularTodo();
             }
         }
 
-        // Dibuja en la pantalla los números y los iconitos
-        function actualizarPantalla() {
-            document.getElementById('total-precio').innerText = panesActuales * precioUnitario;
-            
-            let iconos = "";
-            for(let i=0; i<panesActuales; i++) {
-                iconos += "🍞 ";
-            }
-            document.getElementById('iconos-pan').innerText = iconos;
-        }
-
-        // Muestra u oculta el panel del adulto
+        // --- CONFIGURACIÓN ADULTO ---
         function toggleConfig() {
             let panel = document.getElementById('panel-config');
             panel.style.display = (panel.style.display === "block") ? "none" : "block";
         }
 
-        // Actualiza el precio si el adulto lo cambia
         function actualizarPrecio() {
-            precioUnitario = document.getElementById('input-precio').value;
-            actualizarPantalla();
+            precioUnitario = Number(document.getElementById('input-precio').value);
+            calcularTodo();
         }
 
-        // Reinicia el contador general
         function reiniciarDia() {
-            panesDia = 0;
-            document.getElementById('total-dia').innerText = panesDia;
+            if(confirm("¿Poner ventas del día en cero?")) {
+                panesDia = 0;
+                document.getElementById('total-dia').innerText = panesDia;
+            }
         }
     </script>
 </body>
