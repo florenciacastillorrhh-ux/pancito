@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Caja de Panes</title>
+    <style>
+        /* Estilos visuales: colores suaves, botones gigantes y sin texto complejo */
+        body { font-family: sans-serif; text-align: center; background-color: #f4f4f9; margin: 0; padding: 20px; }
+        h1 { color: #333; }
+        
+        .btn-pan { 
+            font-size: 120px; 
+            padding: 20px 40px; 
+            border-radius: 30px; 
+            border: none; 
+            background: #ffdfba; 
+            box-shadow: 0 8px 15px rgba(0,0,0,0.15); 
+            cursor: pointer; 
+            transition: transform 0.1s; 
+            margin-top: 20px;
+        }
+        .btn-pan:active { transform: scale(0.95); } /* Efecto de hundirse al tocar */
+        
+        .iconos-container { min-height: 80px; font-size: 50px; margin: 20px 0; }
+        .total-texto { font-size: 60px; font-weight: bold; margin: 20px 0; color: #222; }
+        
+        .btn-cobrar { 
+            font-size: 40px; 
+            padding: 20px 50px; 
+            background-color: #baffc9; 
+            border: none; 
+            border-radius: 20px; 
+            cursor: pointer; 
+            box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+        }
+        .btn-cobrar:active { transform: scale(0.95); }
+
+        .estadisticas { margin-top: 40px; font-size: 24px; color: #555; }
+        
+        /* Panel del adulto oculto por defecto */
+        .btn-config { position: absolute; top: 20px; right: 20px; font-size: 35px; background: none; border: none; cursor: pointer; }
+        .panel-config { display: none; background: #ddd; padding: 20px; border-radius: 15px; margin-top: 40px; text-align: left; }
+        .panel-config input { font-size: 20px; width: 80px; text-align: center; }
+        .panel-config button { font-size: 20px; padding: 10px; margin-top: 10px; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <!-- Botón discreto para el adulto -->
+    <button class="btn-config" onclick="toggleConfig()">⚙️</button>
+
+    <h1>Venta de Pan</h1>
+    
+    <!-- El botón gigante para el chico -->
+    <button class="btn-pan" onclick="agregarPan()">🍞</button>
+    
+    <!-- Acá aparecen los dibujitos de los panes que va tocando -->
+    <div class="iconos-container" id="iconos-pan"></div>
+    
+    <!-- El precio total a cobrar -->
+    <div class="total-texto">Total: $<span id="total-precio">0</span></div>
+    
+    <!-- Botón para cerrar la venta -->
+    <button class="btn-cobrar" onclick="cobrar()">✅ Listo</button>
+
+    <!-- Contador del día -->
+    <div class="estadisticas">
+        Panes vendidos hoy: <strong id="total-dia">0</strong>
+    </div>
+
+    <!-- Panel de configuración (solo se ve si tocan la tuerca) -->
+    <div class="panel-config" id="panel-config">
+        <h3>Configuración (Adulto)</h3>
+        <label>Precio por pan: $</label>
+        <input type="number" id="input-precio" value="1" onchange="actualizarPrecio()">
+        <br>
+        <button onclick="reiniciarDia()">Reiniciar día a cero</button>
+    </div>
+
+    <script>
+        // Variables donde guardamos los datos
+        let precioUnitario = 1;
+        let panesActuales = 0;
+        let panesDia = 0;
+
+        // Función que se activa cuando toca el pan gigante
+        function agregarPan() {
+            panesActuales++;
+            actualizarPantalla();
+        }
+
+        // Función que se activa cuando cobra (botón verde)
+        function cobrar() {
+            if(panesActuales > 0) {
+                panesDia += panesActuales;
+                panesActuales = 0;
+                document.getElementById('total-dia').innerText = panesDia;
+                actualizarPantalla();
+            }
+        }
+
+        // Dibuja en la pantalla los números y los iconitos
+        function actualizarPantalla() {
+            document.getElementById('total-precio').innerText = panesActuales * precioUnitario;
+            
+            let iconos = "";
+            for(let i=0; i<panesActuales; i++) {
+                iconos += "🍞 ";
+            }
+            document.getElementById('iconos-pan').innerText = iconos;
+        }
+
+        // Muestra u oculta el panel del adulto
+        function toggleConfig() {
+            let panel = document.getElementById('panel-config');
+            panel.style.display = (panel.style.display === "block") ? "none" : "block";
+        }
+
+        // Actualiza el precio si el adulto lo cambia
+        function actualizarPrecio() {
+            precioUnitario = document.getElementById('input-precio').value;
+            actualizarPantalla();
+        }
+
+        // Reinicia el contador general
+        function reiniciarDia() {
+            panesDia = 0;
+            document.getElementById('total-dia').innerText = panesDia;
+        }
+    </script>
+</body>
+</html>
