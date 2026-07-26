@@ -23,23 +23,30 @@
         
         .iconos-container { 
             min-height: 80px; 
-            font-size: 45px; 
             margin: 20px 0; 
             display: flex; 
             flex-wrap: wrap; 
             justify-content: center; 
-            gap: 8px; 
+            gap: 10px; 
             padding: 0 10px;
         }
         
-        /* Cada icono de pan se puede tocar para borrarlo individualmente */
+        /* Cada pan de la lista ahora es un botón táctil real para asegurar el toque en tablets */
         .icono-item {
+            background: #fff;
+            border: 2px solid #e0dad0;
+            border-radius: 12px;
+            font-size: 40px;
+            padding: 5px 10px;
             cursor: pointer;
-            transition: transform 0.1s, opacity 0.2s;
-            display: inline-block;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.05);
+            transition: transform 0.1s, background-color 0.1s;
         }
-        .icono-item:hover { transform: scale(1.15); opacity: 0.7; }
-        .icono-item:active { transform: scale(0.85); }
+        .icono-item:active { 
+            transform: scale(0.85); 
+            background-color: #f8d7da; 
+            border-color: #f5c6cb;
+        }
 
         .total-texto { font-size: 55px; font-weight: bold; margin: 15px 0; color: #2c2825; }
         
@@ -102,7 +109,6 @@
         let panesActuales = 0;
         let panesDia = 0;
 
-        // Sonidos sintéticos diferenciados (Agregar vs Quitar)
         function reproducirSonido(tipo) {
             try {
                 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -116,7 +122,6 @@
                     gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
                     gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.2);
                 } else {
-                    // Sonido más grave para indicar que se restó/borró
                     osc.type = 'triangle';
                     osc.frequency.setValueAtTime(400, audioCtx.currentTime);
                     osc.frequency.exponentialRampToValueAtTime(200, audioCtx.currentTime + 0.15);
@@ -128,7 +133,7 @@
                 gain.connect(audioCtx.destination);
                 osc.start();
                 osc.stop(audioCtx.currentTime + 0.2);
-            } catch (e) { console.log("Audio bloqueado por navegador"); }
+            } catch (e) { console.log("Audio bloqueado"); }
         }
 
         function agregarPan() {
@@ -162,14 +167,14 @@
             contenedor.innerHTML = "";
             
             if (panesActuales > 0) {
-                hint.innerText = "💡 Si te pasaste, tocá cualquier pan de abajo para sacarlo.";
+                hint.innerText = "💡 Si te pasaste, tocá cualquier pancito de abajo para sacarlo.";
                 for(let i = 0; i < panesActuales; i++) {
-                    let span = document.createElement('span');
-                    span.className = 'icono-item';
-                    span.innerText = "🍞";
-                    // Al tocar un pan individual de la lista, se ejecuta la función para restarlo
-                    span.onclick = () => quitarPan();
-                    contenedor.appendChild(span);
+                    // Usamos un botón real para garantizar respuesta táctil inmediata en pantallas táctiles
+                    let btn = document.createElement('button');
+                    btn.className = 'icono-item';
+                    btn.innerText = "🍞";
+                    btn.onclick = () => quitarPan();
+                    contenedor.appendChild(btn);
                 }
             } else {
                 hint.innerText = "";
