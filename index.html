@@ -3,25 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Caja de Panes - Zephyr</title>
+    <title>Caja de Panes Simple</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; text-align: center; background-color: #f7f5f0; margin: 0; padding: 20px; color: #333; }
-        h1 { color: #5a534f; margin-bottom: 10px; }
+        body { font-family: 'Segoe UI', sans-serif; text-align: center; background-color: #f7f5f0; margin: 0; padding: 20px; color: #333; }
+        h1 { color: #5a534f; }
         
         .btn-pan { 
             font-size: 110px; 
-            padding: 20px 40px; 
+            padding: 15px 40px; 
             border-radius: 35px; 
             border: none; 
             background: #fceade; 
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1); 
+            box-shadow: 0 8px 15px rgba(0,0,0,0.1); 
             cursor: pointer; 
-            transition: transform 0.1s, background 0.2s; 
-            margin-top: 15px;
+            transition: transform 0.1s; 
+            margin-top: 10px;
         }
-        .btn-pan:active { transform: scale(0.93); background: #f7d5c5; }
+        .btn-pan:active { transform: scale(0.93); }
         
-        .iconos-container { min-height: 70px; font-size: 45px; margin: 15px 0; word-break: break-all; padding: 0 20px; }
+        .iconos-container { 
+            min-height: 80px; 
+            font-size: 45px; 
+            margin: 20px 0; 
+            display: flex; 
+            flex-wrap: wrap; 
+            justify-content: center; 
+            gap: 8px; 
+            padding: 0 10px;
+        }
+        
+        /* Cada icono de pan se puede tocar para borrarlo individualmente */
+        .icono-item {
+            cursor: pointer;
+            transition: transform 0.1s, opacity 0.2s;
+            display: inline-block;
+        }
+        .icono-item:hover { transform: scale(1.15); opacity: 0.7; }
+        .icono-item:active { transform: scale(0.85); }
+
         .total-texto { font-size: 55px; font-weight: bold; margin: 15px 0; color: #2c2825; }
         
         .btn-cobrar { 
@@ -37,17 +56,16 @@
         }
         .btn-cobrar:active { transform: scale(0.95); }
 
-        .estadisticas { margin-top: 30px; font-size: 22px; color: #666; background: #fff; display: inline-block; padding: 10px 25px; border-radius: 15px; box-shadow: 0 3px 6px rgba(0,0,0,0.05); }
+        .estadisticas { margin-top: 35px; font-size: 22px; color: #666; background: #fff; display: inline-block; padding: 10px 25px; border-radius: 15px; box-shadow: 0 3px 6px rgba(0,0,0,0.05); }
         
-        /* Panel del adulto */
+        .hint-borrar { font-size: 16px; color: #777; margin-top: 5px; font-style: italic; min-height: 24px; }
+
+        /* Panel config */
         .btn-config { position: absolute; top: 20px; right: 20px; font-size: 30px; background: none; border: none; cursor: pointer; }
-        .panel-config { display: none; background: #fff; padding: 25px; border-radius: 20px; margin: 30px auto; max-width: 450px; text-align: left; box-shadow: 0 8px 20px rgba(0,0,0,0.1); border: 1px solid #e3ded8; }
-        .panel-config h3 { margin-top: 0; color: #443e3b; }
+        .panel-config { display: none; background: #fff; padding: 25px; border-radius: 20px; margin: 30px auto; max-width: 400px; text-align: left; box-shadow: 0 8px 20px rgba(0,0,0,0.1); border: 1px solid #e3ded8; }
         .panel-config label { font-size: 18px; display: block; margin-top: 10px; }
-        .panel-config input, .panel-config select { font-size: 20px; width: 100%; padding: 8px; margin-top: 5px; box-sizing: border-box; border-radius: 8px; border: 1px solid #ccc; }
-        .panel-config button.btn-accion { font-size: 18px; padding: 10px 15px; margin-top: 15px; cursor: pointer; background: #e8e3dc; border: none; border-radius: 10px; width: 100%; font-weight: bold; }
-        
-        .vuelto-box { margin-top: 15px; background: #f0f4f8; padding: 12px; border-radius: 10px; font-size: 18px; color: #1d3557; }
+        .panel-config input { font-size: 20px; width: 100%; padding: 8px; margin-top: 5px; box-sizing: border-box; border-radius: 8px; border: 1px solid #ccc; }
+        .panel-config button.btn-accion { font-size: 18px; padding: 10px; margin-top: 15px; cursor: pointer; background: #f8d7da; color: #721c24; border: none; border-radius: 10px; width: 100%; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -56,88 +74,75 @@
 
     <h1>Venta de Pan</h1>
     
+    <!-- Botón gigante para sumar -->
     <button class="btn-pan" onclick="agregarPan()">🍞</button>
     
+    <!-- Contenedor de iconos interactivos -->
     <div class="iconos-container" id="iconos-pan"></div>
+    <div class="hint-borrar" id="hint-borrar"></div>
     
     <div class="total-texto">Total: $<span id="total-precio">0</span></div>
     
-    <button class="btn-cobrar" onclick="cobrar()">✅ Cobrar / Listo</button>
+    <button class="btn-cobrar" onclick="cobrar()">✅ Listo (Cobrar)</button>
 
     <div class="estadisticas">
         Panes vendidos hoy: <strong id="total-dia">0</strong>
     </div>
 
-    <!-- Panel de configuración y calculose de vuelto -->
+    <!-- Panel de configuración oculto -->
     <div class="panel-config" id="panel-config">
-        <h3>Panel de Control (Adulto)</h3>
-        
+        <h3>Panel Adulto</h3>
         <label>Precio unitario por pan ($):</label>
-        <input type="number" id="input-precio" value="100" onchange="actualizarPrecio()">
-
-        <hr style="margin: 20px 0; border: none; border-top: 1px solid #eee;">
-
-        <h3>Asistente de Vuelto</h3>
-        <label>¿Con cuánto paga el cliente? ($):</label>
-        <input type="number" id="input-pago" placeholder="Ej: 5000, 10000" oninput="calcularVuelto()">
-        
-        <div class="vuelto-box" id="resultado-vuelto">
-            Ingresá el billete con el que paga para calcular el vuelto.
-        </div>
-
-        <button class="btn-accion" onclick="reiniciarDia()" style="background: #f8d7da; color: #721c24;">Reiniciar contador diario</button>
+        <input type="number" id="input-precio" value="1000" onchange="actualizarPrecio()">
+        <button class="btn-accion" onclick="reiniciarDia()">Reiniciar contador diario</button>
     </div>
 
     <script>
-        let precioUnitario = 100; // Arrancamos con un valor más real en pesos
+        let precioUnitario = 1000;
         let panesActuales = 0;
         let panesDia = 0;
 
-        // Reproductor de sonido sintético tipo "Caja Registradora / Din Don"
-        function reproducirSonidoCaja() {
+        // Sonidos sintéticos diferenciados (Agregar vs Quitar)
+        function reproducirSonido(tipo) {
             try {
                 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
                 
-                // Nota 1 (Campanita alta)
-                const osc1 = audioCtx.createOscillator();
-                const gain1 = audioCtx.createGain();
-                osc1.type = 'sine';
-                osc1.frequency.setValueAtTime(987.77, audioCtx.currentTime); // Nota B5
-                gain1.gain.setValueAtTime(0.15, audioCtx.currentTime);
-                gain1.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + 0.3);
+                if (tipo === 'agregar') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(1200, audioCtx.currentTime + 0.15);
+                    gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.2);
+                } else {
+                    // Sonido más grave para indicar que se restó/borró
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(400, audioCtx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(200, audioCtx.currentTime + 0.15);
+                    gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.2);
+                }
                 
-                osc1.connect(gain1);
-                gain1.connect(audioCtx.destination);
-                
-                osc1.start();
-                osc1.stop(audioCtx.currentTime + 0.3);
-
-                // Nota 2 (Cha-ching metálico secundario a los 100ms)
-                setTimeout(() => {
-                    const osc2 = audioCtx.createOscillator();
-                    const gain2 = audioCtx.createGain();
-                    osc2.type = 'triangle';
-                    osc2.frequency.setValueAtTime(1318.51, audioCtx.currentTime); // Nota E6
-                    gain2.gain.setValueAtTime(0.1, audioCtx.currentTime);
-                    gain2.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + 0.4);
-                    
-                    osc2.connect(gain2);
-                    gain2.connect(audioCtx.destination);
-                    
-                    osc2.start();
-                    osc2.stop(audioCtx.currentTime + 0.4);
-                }, 100);
-
-            } catch (e) {
-                // Si el navegador bloquea audio por políticas de interacción, no hace nada y evita errores
-                console.log("Audio no soportado o bloqueado preliminarmente");
-            }
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.2);
+            } catch (e) { console.log("Audio bloqueado por navegador"); }
         }
 
         function agregarPan() {
             panesActuales++;
-            reproducirSonidoCaja();
+            reproducirSonido('agregar');
             actualizarPantalla();
+        }
+
+        function quitarPan() {
+            if (panesActuales > 0) {
+                panesActuales--;
+                reproducirSonido('quitar');
+                actualizarPantalla();
+            }
         }
 
         function cobrar() {
@@ -145,24 +150,29 @@
                 panesDia += panesActuales;
                 panesActuales = 0;
                 document.getElementById('total-dia').innerText = panesDia;
-                document.getElementById('input-pago').value = "";
-                document.getElementById('resultado-vuelto').innerText = "Ingresá el billete con el que paga para calcular el vuelto.";
                 actualizarPantalla();
             }
         }
 
         function actualizarPantalla() {
-            let total = panesActuales * precioUnitario;
-            document.getElementById('total-precio').innerText = total;
+            document.getElementById('total-precio').innerText = panesActuales * precioUnitario;
             
-            let iconos = "";
-            for(let i=0; i<panesActuales; i++) {
-                iconos += "🍞 ";
-            }
-            document.getElementById('iconos-pan').innerText = iconos;
+            let contenedor = document.getElementById('iconos-pan');
+            let hint = document.getElementById('hint-borrar');
+            contenedor.innerHTML = "";
             
-            if(document.getElementById('input-pago').value) {
-                calcularVuelto();
+            if (panesActuales > 0) {
+                hint.innerText = "💡 Si te pasaste, tocá cualquier pan de abajo para sacarlo.";
+                for(let i = 0; i < panesActuales; i++) {
+                    let span = document.createElement('span');
+                    span.className = 'icono-item';
+                    span.innerText = "🍞";
+                    // Al tocar un pan individual de la lista, se ejecuta la función para restarlo
+                    span.onclick = () => quitarPan();
+                    contenedor.appendChild(span);
+                }
+            } else {
+                hint.innerText = "";
             }
         }
 
@@ -176,51 +186,8 @@
             actualizarPantalla();
         }
 
-        function calcularVuelto() {
-            let totalCompra = panesActuales * precioUnitario;
-            let pagoCliente = Number(document.getElementById('input-pago').value);
-            let vueltoDiv = document.getElementById('resultado-vuelto');
-
-            if (!pagoCliente || pagoCliente <= 0) {
-                vueltoDiv.innerHTML = "Ingresá un monto válido.";
-                return;
-            }
-
-            if (pagoCliente < totalCompra) {
-                vueltoDiv.innerHTML = "⚠️ El dinero no alcanza para cubrir el total ($" + totalCompra + ").";
-                return;
-            }
-
-            let vueltoTotal = pagoCliente - totalCompra;
-            
-            if (vueltoTotal === 0) {
-                vueltoDiv.innerHTML = "✨ <b>Pago justo.</b> No hay que dar vuelto.";
-                return;
-            }
-
-            // Desglose en billetes argentinos comunes (10000, 2000, 1000, 500, 200, 100)
-            let billetes = [10000, 2000, 1000, 500, 200, 100];
-            let desgloseText = `<b>Vuelto total: $${vueltoTotal}</b><br>`;
-            let resto = vueltoTotal;
-
-            let detalleBilletes = [];
-            for (let b of billetes) {
-                let cantidad = Math.floor(resto / b);
-                if (cantidad > 0) {
-                    detalleBilletes.push(`${cantidad} de $${b}`);
-                    resto %= b;
-                }
-            }
-
-            if (detalleBilletes.length > 0) {
-                vueltoDiv.innerHTML = desgloseText + "Devolver: " + detalleBilletes.join(", ");
-            } else {
-                vueltoDiv.innerHTML = desgloseText + "Resto menor a $100.";
-            }
-        }
-
         function reiniciarDia() {
-            if(confirm("¿Querés poner el contador del día en cero?")) {
+            if(confirm("¿Poner el contador del día en cero?")) {
                 panesDia = 0;
                 document.getElementById('total-dia').innerText = panesDia;
             }
